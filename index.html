@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HMB</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div>
+		<label id="langLabel">Idioma: </label>
+		<select id="langS">
+			<option value="pt-br">Português</option>
+			<option value="en">English</option>
+		</select>
+
+		<label id="moedaLang">Moeda: </label>
+		<select id="moedaS">
+			<option value="BRL">Real (BRL)</option>
+			<option value="USD">Dolar (USD)</option>
+		</select>
+	</div>
+	<section id="block">
+		<h2>BitCoin Percent return</h2>
+		<p><span id="c"></span> (<span class="nameCurr"></span>): <span id="cotacaoNow"></span></p>
+		<p><span id="t1"></span> <input type="number" class="input" style="width: 150px;" id="valorComprado" min="0" placeholder="0.00000000"> <span id="t2"></span> <input type="text" class="input" id="nomeMoedaComprada" placeholder="Nome da moeda">. </p>
+		<p><span id="t3"></span> <span class="nomemoeda"></span> <span id="t4"></span> <input type="number" style="width: 150px;" min="0" class="input" id="valorMoedaEmBtc" placeholder="0.00000000"> <span id="t5"></span></p>
+		<p class="saldo"><span id="t6"></span> <span class="nomemoeda"></span> <span id="t7"></span> <span class="saldomoeda mainSaldo"></span></p>
+		<p><span id="t8"></span> <input type="number" style="width: 60px;" value="0" class="input" min="0" id="percent"><span id="t9"></span></p>
+		<p><span id="t10"></span> <span class="saldomoeda"></span> <span class="nomemoeda"></span> <span id="t11"></span></p>
+		<h2 id="sellOnIt">X <span class="sub"><span id="t12"></span></span></h2>
+
+		<h3><span id="t13"></span> <span id="lucroBtc">X (BTC)</span></h3>
+		<p><span class="nameCurr"></span>: <span id="valueCurr"></span></p>
+		<p><span id="t14"></span> BlockChain</p>
+	</section>
+</body>
+<script type="text/javascript">
+
+	var valorComprado;
+	var nomeMoedaComprada;
+	var valorMoedaEmBtc;
+	var saldo;
+	var lucroBtc = 0;
+	var percent;
+	var sellOnIt;
+
+	/*LISTENERS*/
+
+	document.getElementById('valorComprado').addEventListener('input', event=>{
+		valorComprado = (isNaN(parseFloat(event.target.value))) ? 0 : parseFloat(event.target.value);
+		if(valorComprado!=undefined && valorMoedaEmBtc!=undefined) mostraSaldo();
+		if(valorComprado!=undefined && valorMoedaEmBtc!=undefined && percent !=undefined) {mostraValue(); mostraLucro();};
+	});
+
+	document.getElementById('nomeMoedaComprada').addEventListener('input', event=>{
+		nomeMoedaComprada = event.target.value;
+		els = document.querySelectorAll('.nomemoeda');
+		els.forEach(el=>{
+			el.innerHTML = nomeMoedaComprada;
+		})
+	});
+
+	document.getElementById('valorMoedaEmBtc').addEventListener('input', event=>{
+		valorMoedaEmBtc = (isNaN(parseFloat(event.target.value))) ? 0 : parseFloat(event.target.value);
+		if(valorComprado!=undefined && valorMoedaEmBtc!=undefined) mostraSaldo();
+		if(valorComprado!=undefined && valorMoedaEmBtc!=undefined && percent !=undefined) {mostraValue(); mostraLucro();};		
+	});
+
+	document.getElementById('percent').addEventListener('input', event=>{
+		percent = (isNaN(parseFloat(event.target.value))) ? 0 : parseFloat(event.target.value);
+		if(valorComprado!=undefined && valorMoedaEmBtc!=undefined && percent !=undefined) {mostraValue(); mostraLucro();};
+	});
+
+	document.getElementById('langS').addEventListener('change', event=>{
+		lhttp.open('GET', `${event.target.value}.js`, true);
+		lhttp.send();
+	});
+
+	document.getElementById('moedaS').addEventListener('change', event=>{
+		curr = event.target.value;
+	});
+
+
+
+
+	/*FUNÇÕES DE CALCULO*/
+
+
+	function calcularSaldoDaMoeda(valueCompradoBtc, valorEmBtc){
+		saldo = (valueCompradoBtc!=0 && valorEmBtc!=0) ? valueCompradoBtc/valorEmBtc : 0;
+		return saldo;
+	}
+
+	function calcularValorParaVender(c, saldoMoeda, percent){
+		/*CACULANDO O VALOR DE RETORNO*/
+		let value = (valorComprado/100)*percent;
+		let total = valorComprado+value;
+		/*VENDER EM*/
+		let venderEm = total / saldoMoeda;
+		return venderEm;
+	}
+
+	function calcularLucroBtc(valorComprado, valorParaVender, quantidade){
+		let total = valorParaVender*quantidade;
+		lucroBtc = total-valorComprado
+		return lucroBtc; 
+	}
+
+
+	/*FUNÇÕES DE SHOW DATA*/
+
+	function mostraSaldo(){
+		let saldoM = calcularSaldoDaMoeda(valorComprado, valorMoedaEmBtc);
+		els = document.querySelectorAll('.saldomoeda');
+		els.forEach(el=>{
+			el.innerHTML = saldoM.toFixed(8);
+		});
+	}
+
+	function mostraValue(){
+		sellOnIt = calcularValorParaVender(valorComprado, saldo, percent)
+		document.getElementById('sellOnIt').innerHTML = sellOnIt.toFixed(8)+" <span class='sub'>(BTC)</span>";
+	}
+
+	function mostraLucro(){
+		let lucro = calcularLucroBtc(valorComprado, sellOnIt, saldo);
+		document.getElementById('lucroBtc').innerHTML = lucro.toFixed(8);
+	}
+
+
+	function verLucroEmValores(curr, symbol, valor){
+		let els = document.querySelectorAll('.nameCurr');
+		els.forEach((el)=>{
+			el.innerHTML = curr;
+		});
+		document.getElementById('valueCurr').innerHTML = symbol+valor.toFixed(3);
+	}
+
+	function verCotacao(symbol, valor){
+		document.getElementById('cotacaoNow').innerHTML = symbol+valor;
+	}
+
+	function verMoeda(data, value){
+
+	}
+
+	/* DADOS DE VALORES */
+	
+	var curr = document.getElementById('moedaS').value;
+	var lang = document.getElementById('langS').value;
+	var indexes = ["c","t1","t2","t3","t4","t5","t6","t7","t8","t9","t10","t11","t12","t13","t14"];
+	
+	var http = new XMLHttpRequest();
+
+	http.onreadystatechange = ()=>{
+		if(http.readyState == XMLHttpRequest.DONE){
+			let data = JSON.parse(http.responseText);
+			let valur = lucroBtc*data[curr].last;
+			verLucroEmValores( curr, data[curr].symbol, valur);
+			verCotacao(data[curr].symbol, data[curr].last);
+		}
+	};	
+	http.open('get', "https://blockchain.info/ticker", true);
+	http.send();
+	setInterval(()=>{
+		http.open('get', "https://blockchain.info/ticker", true);
+		http.send();
+	}, 1000);
+
+
+	/*DADOS DE LINGUAGEM*/
+
+	var lhttp = new XMLHttpRequest();
+
+	lhttp.onreadystatechange = ()=>{
+		if(lhttp.readyState == XMLHttpRequest.DONE){
+			setLanguage(indexes, lhttp.responseText);
+		}
+	}
+
+	lhttp.open('GET', `${lang}.js`, true);
+	lhttp.send();
+
+
+	function setLanguage(indexes, objLang){
+		data = JSON.parse(objLang);
+		indexes.forEach(i=>{
+			document.getElementById(i).innerHTML = data[i]
+		});
+		document.getElementById("nomeMoedaComprada").placeholder = data['place'];
+	}
+
+</script>
+</html>
