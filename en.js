@@ -14,5 +14,17 @@
 	"t12": "(BTC)",
 	"t13": "and my profit on BTC will be: ",
 	"t14": "Font: ",
-	"place": "name of currency"
+	"place": "name of currency",
+	"fee": "with fee percent",
+	"btn1": "Save",
+	"btn2": "Clear",
+	"btn3": "Show/Hide Table",
+	"table1": "Date",
+	"table2": "Currency",
+	"table3": "Bought (BTC)",
+	"table4": "Unit Value (BTC)",
+	"table5": "Fee",
+	"table6": "Amount",
+	"table7": "Price to Sell (BTC)",
+	"table8": "Profit (BTC)"
 }
