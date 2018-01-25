@@ -65,6 +65,7 @@
 	var valorMoedaEmBtc;
 	var saldo;
 	var lucroBtc = 0;
+	var precoTaxa = 0;
 	var percent;
 	var fee = 0;
 	var sellOnIt;
@@ -141,14 +142,21 @@
 
 	function calcularValorParaVender(c, saldoMoeda, percent, tx){
 		/*CACULANDO O VALOR DE RETORNO*/
-		let value = (valorComprado/100)*(percent+tx);
+		let value = (valorComprado/100)*percent;
 		let total = valorComprado+value;
+
+
 		/*VENDER EM*/
 		let venderEm = total / saldoMoeda;
+
+		precoTaxa = (venderEm/100)*tx;
+
+		console.log(precoTaxa);
+
 		return venderEm;
 	}
 
-	function calcularLucroBtc(valorComprado, valorParaVender, quantidade){
+	function calcularLucroBtc(valorComprado, valorParaVender, quantidade,){
 		let total = valorParaVender*quantidade;
 		lucroBtc = total-valorComprado
 		return lucroBtc; 
@@ -167,7 +175,7 @@
 
 	function mostraValue(){
 		sellOnIt = calcularValorParaVender(valorComprado, saldo, percent, fee)
-		document.getElementById('sellOnIt').innerHTML = sellOnIt.toFixed(8)+" <span class='sub'>(BTC)</span>";
+		document.getElementById('sellOnIt').innerHTML = (sellOnIt+precoTaxa).toFixed(8)+" <span class='sub'>(BTC)</span>";
 	}
 
 	function mostraLucro(){
